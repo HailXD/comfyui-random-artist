@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import re
 
 
 ARTISTS = []
@@ -25,12 +26,18 @@ def _load_artists():
         ARTISTS = []
 
 
+def _escape_parentheses(name):
+    escaped = re.sub(r"(?<!\\)\(", r"\\(", name)
+    escaped = re.sub(r"(?<!\\)\)", r"\\)", escaped)
+    return escaped
+
+
 _load_artists()
 
 
 class RandomArtist:
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("artists",)
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("artists", "artists_semicolon")
     FUNCTION = "pick"
     CATEGORY = "Random"
 
@@ -50,10 +57,10 @@ class RandomArtist:
 
     def pick(self, n, randomise_strength):
         if not ARTISTS:
-            return ("",)
+            return ("", "")
         count = max(0, int(n))
         if count == 0:
-            return ("",)
+            return ("", "")
         if count <= len(ARTISTS):
             picks = random.sample(ARTISTS, count)
         else:
@@ -61,6 +68,7 @@ class RandomArtist:
         if str(randomise_strength).lower() == "enabled":
             weighted_picks = []
             for artist in picks:
+                artist = _escape_parentheses(artist)
                 weight_value = random.choice(WEIGHT_VALUES)
                 if weight_value == 100:
                     weighted_picks.append(artist)
@@ -70,8 +78,8 @@ class RandomArtist:
                 weighted_picks.append(f"({artist}:{weight_str})")
             combined = ", ".join(weighted_picks)
         else:
-            combined = ", ".join(picks)
-        return (combined,)
+            combined = ", ".join(_escape_parentheses(artist) for artist in picks)
+        return (combined, combined.replace(":", ";"))
 
 
 NODE_CLASS_MAPPINGS = {
