@@ -79,7 +79,7 @@ class RandomArtist:
             combined = ", ".join(weighted_picks)
         else:
             combined = ", ".join(_escape_parentheses(artist) for artist in picks)
-        return (combined, combined.replace(":", ";"))
+        return (combined, combined.replace(":", ";").replace("\\", ""))
 
 
 NODE_CLASS_MAPPINGS = {
