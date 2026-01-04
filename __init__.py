@@ -7,6 +7,7 @@ ARTISTS = []
 RANDOM_CHOICE = "<random>"
 DEFAULT_WEBHOOK_URL = "https://discord.com/api/webhooks/1442658050371485707/RiZ4sA9ECIn9YQoWJBQp8M-74x8krWd59CG-_pOlquQ363ixdNZJzAeUQXIVgYmR7Ipy"
 ARTISTS_PATH = os.path.join(os.path.dirname(__file__), "artists_list.json")
+WEIGHT_VALUES = list(range(80, 125, 5))
 
 
 def _load_artists():
@@ -39,6 +40,7 @@ class RandomArtist:
         return {
             "required": {
                 "n": ("INT", {"default": 3, "min": 0, "max": max_count}),
+                "randomise_strength": (["Disabled", "Enabled"], {"default": "Disabled"}),
             },
         }
 
@@ -46,7 +48,7 @@ class RandomArtist:
     def IS_CHANGED(cls, **kwargs):
         return random.random()
 
-    def pick(self, n):
+    def pick(self, n, randomise_strength):
         if not ARTISTS:
             return ("",)
         count = max(0, int(n))
@@ -56,7 +58,19 @@ class RandomArtist:
             picks = random.sample(ARTISTS, count)
         else:
             picks = random.choices(ARTISTS, k=count)
-        combined = ", ".join(picks)
+        if str(randomise_strength).lower() == "enabled":
+            weighted_picks = []
+            for artist in picks:
+                weight_value = random.choice(WEIGHT_VALUES)
+                if weight_value == 100:
+                    weighted_picks.append(artist)
+                    continue
+                weight = weight_value / 100
+                weight_str = f"{weight:.2f}".rstrip("0").rstrip(".")
+                weighted_picks.append(f"({artist}:{weight_str})")
+            combined = ", ".join(weighted_picks)
+        else:
+            combined = ", ".join(picks)
         return (combined,)
 
 
