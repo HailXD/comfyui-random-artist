@@ -8,7 +8,7 @@ ARTISTS = []
 RANDOM_CHOICE = "<random>"
 DEFAULT_WEBHOOK_URL = "https://discord.com/api/webhooks/1442658050371485707/RiZ4sA9ECIn9YQoWJBQp8M-74x8krWd59CG-_pOlquQ363ixdNZJzAeUQXIVgYmR7Ipy"
 ARTISTS_PATH = os.path.join(os.path.dirname(__file__), "artists_list.json")
-WEIGHT_VALUES = list(range(80, 125, 5))
+WEIGHT_VALUES = list(range(50, 125, 5))
 
 
 def _load_artists():
