@@ -48,6 +48,7 @@ class RandomArtist:
             "required": {
                 "n": ("INT", {"default": 3, "min": 0, "max": max_count}),
                 "randomise_strength": (["Disabled", "Enabled"], {"default": "Disabled"}),
+                "override": ("STRING", {"default": ""}),
             },
         }
 
@@ -55,7 +56,10 @@ class RandomArtist:
     def IS_CHANGED(cls, **kwargs):
         return random.random()
 
-    def pick(self, n, randomise_strength):
+    def pick(self, n, randomise_strength, override):
+        override_text = str(override) if override is not None else ""
+        if override_text.strip():
+            return (override_text, override_text)
         if not ARTISTS:
             return ("", "")
         count = max(0, int(n))
