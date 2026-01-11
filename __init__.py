@@ -6,7 +6,6 @@ import re
 
 ARTISTS = []
 RANDOM_CHOICE = "<random>"
-DEFAULT_WEBHOOK_URL = "https://discord.com/api/webhooks/1442658050371485707/RiZ4sA9ECIn9YQoWJBQp8M-74x8krWd59CG-_pOlquQ363ixdNZJzAeUQXIVgYmR7Ipy"
 ARTISTS_PATH = os.path.join(os.path.dirname(__file__), "artists_list.json")
 WEIGHT_VALUES = list(range(50, 125, 5))
 
@@ -48,8 +47,8 @@ class RandomArtist:
             "required": {
                 "n": ("INT", {"default": 3, "min": 0, "max": max_count}),
                 "randomise_strength": (["Disabled", "Enabled"], {"default": "Disabled"}),
-                "override": ("STRING", {"default": ""}),
-                "prefix": ("STRING", {"default": ""}),
+                "override": ("STRING", {"default": "", "multiline": True}),
+                "prefix": ("STRING", {"default": "", "multiline": True}),
             },
         }
 
@@ -90,10 +89,8 @@ class RandomArtist:
             prefix_base = prefix_text.rstrip()
             if prefix_base.endswith(","):
                 combined = f"{prefix_base} {combined}"
-                combined_semicolon = f"{prefix_base} {combined_semicolon}"
             else:
                 combined = f"{prefix_base}, {combined}"
-                combined_semicolon = f"{prefix_base}, {combined_semicolon}"
         return (combined, combined_semicolon)
 
 
