@@ -11,7 +11,7 @@ ARTISTS_PATH = os.path.join(os.path.dirname(__file__), "artists_list.json")
 WEIGHT_VALUES = list(range(50, 125, 5))
 
 
-def _load_artists():
+def _load_artists() -> None:
     global ARTISTS
     try:
         with open(ARTISTS_PATH, "r", encoding="utf-8") as handle:
@@ -26,7 +26,7 @@ def _load_artists():
         ARTISTS = []
 
 
-def _escape_parentheses(name):
+def _escape_parentheses(name: str) -> str:
     escaped = re.sub(r"(?<!\\)\(", r"\\(", name)
     escaped = re.sub(r"(?<!\\)\)", r"\\)", escaped)
     return escaped
@@ -42,21 +42,22 @@ class RandomArtist:
     CATEGORY = "Random"
 
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(cls) -> dict:
         max_count = max(1, len(ARTISTS)) if ARTISTS else 1
         return {
             "required": {
                 "n": ("INT", {"default": 3, "min": 0, "max": max_count}),
                 "randomise_strength": (["Disabled", "Enabled"], {"default": "Disabled"}),
                 "override": ("STRING", {"default": ""}),
+                "prefix": ("STRING", {"default": ""}),
             },
         }
 
     @classmethod
-    def IS_CHANGED(cls, **kwargs):
+    def IS_CHANGED(cls, **kwargs: object) -> float:
         return random.random()
 
-    def pick(self, n, randomise_strength, override):
+    def pick(self, n: int, randomise_strength: str, override: str, prefix: str) -> tuple[str, str]:
         override_text = str(override) if override is not None else ""
         if override_text.strip():
             return (override_text, override_text)
@@ -83,7 +84,17 @@ class RandomArtist:
             combined = ", ".join(weighted_picks)
         else:
             combined = ", ".join(_escape_parentheses(artist) for artist in picks)
-        return (combined, combined.replace(":", ";").replace("\\", ""))
+        combined_semicolon = combined.replace(":", ";").replace("\\", "")
+        prefix_text = str(prefix) if prefix is not None else ""
+        if prefix_text.strip():
+            prefix_base = prefix_text.rstrip()
+            if prefix_base.endswith(","):
+                combined = f"{prefix_base} {combined}"
+                combined_semicolon = f"{prefix_base} {combined_semicolon}"
+            else:
+                combined = f"{prefix_base}, {combined}"
+                combined_semicolon = f"{prefix_base}, {combined_semicolon}"
+        return (combined, combined_semicolon)
 
 
 NODE_CLASS_MAPPINGS = {
